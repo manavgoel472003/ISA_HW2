@@ -18,6 +18,10 @@ KITTI_DATA_ROOT=/home/manav/workspaces/dataset \
   ./scripts/run_kitti_inference.sh       # KITTI PointPillars + SECOND
 ./scripts/render_open3d_videos.sh        # stitch *_points.ply into MP4 demos
 ```
+To prepare the data:
+- Also Git clone the official mmdetection 3D repositiory
+- Use tools/create_data.py to process the KITTI or nuScenes data (1.0-min, causes a lot of issues I tried)
+- Then adjust the roots in the bash files to follow the root and .pkl file made to use them
 
 Run locations:
 - **Local workstation (CPU)** handled both manual NuScenes jobs (`.../nuscenes_pointpillars_v1.0-mini_manual`, `.../nuscenes_centerpoint_v1.0-mini_manual`).
