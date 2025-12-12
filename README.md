@@ -44,12 +44,29 @@ Screenshots (see `results/01..04_*.png`) capture PointPillars NuScenes multi-vie
 
 ### Sample Visual Evidence
 
-![NuScenes PointPillars — highway multi-view](results/01_nuscenes_pointpillars_front_multiview.png)
-![NuScenes PointPillars — dense traffic](results/02_nuscenes_pointpillars_dense_traffic.png)
-![NuScenes PointPillars — truck close-up](results/03_nuscenes_pointpillars_truck_closeup.png)
-![NuScenes CenterPoint — pedestrians](results/05_nuscenes_centerpoint_frame0.png)
+- Front-view highway multi-view (NuScenes PointPillars): ![NuScenes PointPillars — highway multi-view](results/01_nuscenes_pointpillars_front_multiview.png)
+- Dense downtown traffic with multi-object clutter (NuScenes PointPillars): ![NuScenes PointPillars — dense traffic](results/02_nuscenes_pointpillars_dense_traffic.png)
+- Truck close-up with 3D boxes wrapping the cab/trailer (NuScenes PointPillars): ![NuScenes PointPillars — truck close-up](results/03_nuscenes_pointpillars_truck_closeup.png)
+- Pedestrian-heavy crosswalk predicted by CenterPoint: ![NuScenes CenterPoint — pedestrians](results/05_nuscenes_centerpoint_frame0.png)
 
-## 4. Code Modifications (documented inline)
+## 4. Reproducing These Experiments
+1. **Clone & setup**: Pull this repo to your workstation or HPC login node, then follow the Section 1 virtualenv instructions (Python 3.10+, `pip install openmim`, `mim install ...`, etc.). The NuScenes assets (`./scripts/download_nuscenes_assets.sh`) and KITTI metadata paths must be updated to match your storage layout.
+2. **Manual/local NuScenes runs**: From the repo root, activate the virtualenv and launch:
+   ```bash
+   ./scripts/run_nuscenes_inference.sh
+   ```
+   This script wraps `simple_infer_main.py` to execute both PointPillars and CenterPoint on the v1.0-mini split, saving metrics under `objectdetection/infer_runs/simple_infer_results/`.
+3. **KITTI GPU runs**: Ensure `KITTI_DATA_ROOT` and `KITTI_ANN_FILE` point to your KITTI dataset + annotation pickle, then run:
+   ```bash
+   KITTI_DATA_ROOT=/abs/path/to/kitti \
+   KITTI_ANN_FILE=/abs/path/to/kitti_infos_val.pkl \
+   ./scripts/run_kitti_inference.sh
+   ``` This kitti kitti_inference file works, I tested it out on HPC, but gives same results.
+   Both PointPillars and SECOND checkpoints are evaluated sequentially, producing evaluation JSON plus PNG/PLY diagnostics.
+4. **Batch/HPC workflow**: When running on the cluster I used `./run_all_exp.sh` to orchestrate every experiment (NuScenes manual + eval runs, KITTI baselines, Open3D renders) via a single SLURM submission.
+5. **Optional media export**: After inference, call `./scripts/render_open3d_videos.sh` to regenerate the MP4 flythroughs inside `results/`.
+
+## 5. Code Modifications (documented inline)
 - `simple_infer_utils.py`: added `_boxes_to_sampled_points` and `save_ply_files` enrichment so every sample writes `{token}_points_with_boxes.ply`, plus `_update_experiment_summary` for `all_experiments_summary.json`. The new `set_all_seeds()` helper (with `mmengine_set_seed`) harmonizes RNG seeding across Python/NumPy/Torch/MMEngine.
 - `simple_infer_main.py`: expanded CLI (`--seed`, `--eval-backend`, `--data-source` knobs) and plumbed metadata logging so each run records config/checkpoint/device/seed info before calling `run_manual_benchmark()` or `run_benchmark_evaluation()`.
 - `create_open3d_videos.py` + `scripts/render_open3d_videos.sh`: added automated discovery of `_points.ply` + `_pred/_gt` line sets, uses Open3D’s off-screen renderer to write MP4 clips per experiment.
@@ -57,7 +74,7 @@ Screenshots (see `results/01..04_*.png`) capture PointPillars NuScenes multi-vie
 
 All touched sections carry descriptive comments to make future edits self-explanatory (see the environment helpers near the top of `simple_infer_utils.py`, the PLY utilities around `save_ply_files`, and the CLI docs in `simple_infer_main.py`).
 
-## 5. Takeaways & Limitations
+## 6. Takeaways & Limitations
 1. **CenterPoint dominates NuScenes**: With native support for sweep stacking and circle-NMS, it reaches ~0.40 NDS on the local CPU pass and climbs to 0.45 NDS / 0.48 mAP when the same config/checkpoint is replayed on the H100 cluster. PointPillars collapses (mAP=0) because its checkpoint expects lidar features that the simplified dataloader omits. Hence, random boxes are generated. I am currently working on that.
 2. **KITTI PointPillars remains a strong baseline**: 77–79 AP at 13.7 ms inference proves the runner path is correctly configured; the PNG/PLY diagnostics show tight car boxes even on long-range LiDAR frames.
 3. **SECOND as “SSN” substitute failed catastrophically**: All KITTI AP metrics drop to zero. Logs confirm predictions exist but confidence is ~0, suggesting a mismatch between checkpoint class heads and the KITTI 3-class evaluation script. Need to re-export weights or swap to a true SSN model for fairness.
