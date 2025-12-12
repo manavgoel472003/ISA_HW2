@@ -42,6 +42,13 @@ Run locations:
 
 Screenshots (see `results/01..04_*.png`) capture PointPillars NuScenes multi-view projections: front-view highway scene, dense urban scenario, truck close-up, and a pedestrian-heavy crossroads. Demo videos (Open3D renders) live in `results/*_open3d.mp4` for NuScenes PointPillars, NuScenes CenterPoint, and KITTI PointPillars.
 
+### Sample Visual Evidence
+
+![NuScenes PointPillars — highway multi-view](results/01_nuscenes_pointpillars_front_multiview.png)
+![NuScenes PointPillars — dense traffic](results/02_nuscenes_pointpillars_dense_traffic.png)
+![NuScenes PointPillars — truck close-up](results/03_nuscenes_pointpillars_truck_closeup.png)
+![NuScenes CenterPoint — pedestrians](results/05_nuscenes_centerpoint_frame0.png)
+
 ## 4. Code Modifications (documented inline)
 - `simple_infer_utils.py`: added `_boxes_to_sampled_points` and `save_ply_files` enrichment so every sample writes `{token}_points_with_boxes.ply`, plus `_update_experiment_summary` for `all_experiments_summary.json`. The new `set_all_seeds()` helper (with `mmengine_set_seed`) harmonizes RNG seeding across Python/NumPy/Torch/MMEngine.
 - `simple_infer_main.py`: expanded CLI (`--seed`, `--eval-backend`, `--data-source` knobs) and plumbed metadata logging so each run records config/checkpoint/device/seed info before calling `run_manual_benchmark()` or `run_benchmark_evaluation()`.
