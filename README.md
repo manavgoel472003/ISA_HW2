@@ -21,7 +21,7 @@ KITTI_DATA_ROOT=/home/manav/workspaces/dataset \
 
 Run locations:
 - **Local workstation (CPU)** handled both manual NuScenes jobs (`.../nuscenes_pointpillars_v1.0-mini_manual`, `.../nuscenes_centerpoint_v1.0-mini_manual`).
-- **HPC cluster (NVIDIA H100 NVL, /fs/atipa paths)** produced the high-quality CenterPoint eval (`.../nuscenes_centerpoint_eval/`) and both KITTI baselines (`.../kitti_pointpillars_eval` and `.../kitti_second/eval_runner`), as seen in their `run.log` files.
+- **HPC cluster (NVIDIA H100 NVL, /fs/atipa paths)** produced the high-quality CenterPoint eval (`.../nuscenes_centerpoint_eval/`) and both KITTI baselines (`.../kitti_pointpillars_eval` and `.../kitti_second/eval_runner`), as seen in their `run.log` files. Those jobs were dispatched through the top-level `run_all_exp.sh`, which stitches the NuScenes/KITTI runs plus video generation into a single batch submission.
 
 ## 2. Models & Datasets
 | Dataset | Split | Model | Config | Checkpoint |
@@ -63,7 +63,7 @@ Screenshots (see `results/01..04_*.png`) capture PointPillars NuScenes multi-vie
    ./scripts/run_kitti_inference.sh
    ``` This kitti kitti_inference file works, I tested it out on HPC, but gives same results.
    Both PointPillars and SECOND checkpoints are evaluated sequentially, producing evaluation JSON plus PNG/PLY diagnostics.
-4. **Batch/HPC workflow**: When running on the cluster I used `./run_all_exp.sh` to orchestrate every experiment (NuScenes manual + eval runs, KITTI baselines, Open3D renders) via a single SLURM submission.
+4. **Batch/HPC workflow**: When running on the cluster I used `./run_all_exp.sh` (checked into the repo root) to orchestrate every experiment—NuScenes manual + eval runs, KITTI baselines, and the Open3D renders—in one SLURM submission. Launching `sbatch run_all_exp.sh` recreates the exact H100 workflow end-to-end.
 5. **Optional media export**: After inference, call `./scripts/render_open3d_videos.sh` to regenerate the MP4 flythroughs inside `results/`.
 
 ## 5. Code Modifications (documented inline)
