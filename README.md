@@ -51,12 +51,7 @@ Screenshots (see `results/01..04_*.png`) capture PointPillars NuScenes multi-vie
 All touched sections carry descriptive comments to make future edits self-explanatory (see the environment helpers near the top of `simple_infer_utils.py`, the PLY utilities around `save_ply_files`, and the CLI docs in `simple_infer_main.py`).
 
 ## 5. Takeaways & Limitations
-1. **CenterPoint dominates NuScenes**: With native support for sweep stacking and circle-NMS, it reaches ~0.40 NDS on the local CPU pass and climbs to 0.45 NDS / 0.48 mAP when the same config/checkpoint is replayed on the H100 cluster (`nuscenes_centerpoint_eval/benchmark_nuscenes.json`). PointPillars collapses (mAP=0) because its checkpoint expects lidar features that the simplified dataloader omits. Hence, random boxes are generated. I am currently working on that.
+1. **CenterPoint dominates NuScenes**: With native support for sweep stacking and circle-NMS, it reaches ~0.40 NDS on the local CPU pass and climbs to 0.45 NDS / 0.48 mAP when the same config/checkpoint is replayed on the H100 cluster. PointPillars collapses (mAP=0) because its checkpoint expects lidar features that the simplified dataloader omits. Hence, random boxes are generated. I am currently working on that.
 2. **KITTI PointPillars remains a strong baseline**: 77–79 AP at 13.7 ms inference proves the runner path is correctly configured; the PNG/PLY diagnostics show tight car boxes even on long-range LiDAR frames.
 3. **SECOND as “SSN” substitute failed catastrophically**: All KITTI AP metrics drop to zero. Logs confirm predictions exist but confidence is ~0, suggesting a mismatch between checkpoint class heads and the KITTI 3-class evaluation script. Need to re-export weights or swap to a true SSN model for fairness.
 4. **CPU vs GPU caveat**: NuScenes manual runs executed on CPU to simplify deployment, so latency metrics (≈0.8 s/sample) are not comparable with the GPU KITTI timings (≈14 ms) or the H100-backed CenterPoint evaluation (219 ms). I ran nuscenes offline as i was facing issues with eval on HPC.
-
-## 6. Limitations / Future Work
-- Runner-based NuScenes eval still fails for PointPillars/SSN due to upstream config mismatches; only the manual pipeline completes reliably on CPU.
-- The KITTI SECOND checkpoint requires investigation (possibly wrong ckpt or incompatible class ordering) before drawing strong conclusions.
-- Current screenshots are NuScenes-only; capture KITTI visual grids once its PNG exporter is enabled to cover all datasets equally.
