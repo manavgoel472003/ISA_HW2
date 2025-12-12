@@ -33,7 +33,7 @@ Run locations:
 
 ## 3. Metrics, Media, and Key Evidence
 | Dataset | Model | Run site | Accuracy 1 | Accuracy 2 | Mean latency | Max mem |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- | 
 | NuScenes v1.0-mini | CenterPoint | **HPC (NVIDIA H100 NVL)** | NDS 0.4494 | mAP 0.4796 | 219.3 ms (GPU) | 8 617 MB | 
 | NuScenes v1.0-mini | CenterPoint (local) | Local workstation (CPU-only) | NDS 0.3963 | mAP 0.3883 | 682.9 ms (CPU) | 0 MB | 
 | NuScenes v1.0-mini | PointPillars | Local workstation (CPU-only) | NDS 0.0000 | mAP 0.0000 | 915.7 ms (CPU) | 0 MB | 
