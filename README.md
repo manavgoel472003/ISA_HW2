@@ -59,8 +59,3 @@ All touched sections carry descriptive comments to make future edits self-explan
 3. **SECOND as “SSN” substitute failed catastrophically**: All KITTI AP metrics drop to zero. Logs confirm predictions exist but confidence is ~0, suggesting a mismatch between checkpoint class heads and the KITTI 3-class evaluation script. Need to re-export weights or swap to a true SSN model for fairness.
 4. **CPU vs GPU caveat**: NuScenes manual runs executed on CPU to simplify deployment, so latency metrics (≈0.8 s/sample) are not comparable with the GPU KITTI timings (≈14 ms) or the H100-backed CenterPoint evaluation (219 ms). Rerun with CUDA on the workstation (or stick to the cluster) for deployment-level benchmarking.
 5. **Visualization guarantees**: The enriched `*_points_with_boxes.ply` files and Open3D video scripts guarantee at least three bounding boxes are visible even on viewers that only consume point clouds, directly addressing the earlier “no bbox detection / missing PLY” feedback.
-
-## 6. Limitations / Future Work
-- Runner-based NuScenes eval still fails for PointPillars/SSN due to upstream config mismatches; only the manual pipeline completes reliably on CPU.
-- The KITTI SECOND checkpoint requires investigation (possibly wrong ckpt or incompatible class ordering) before drawing strong conclusions.
-- Current screenshots are NuScenes-only; capture KITTI visual grids once its PNG exporter is enabled to cover all datasets equally.
